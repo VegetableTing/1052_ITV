@@ -1,44 +1,173 @@
 <!DOCTYPE html>
-<html lang="en">
-	<head prefix="og: http://ogp.me/ns#">
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>台灣大學分布</title>
-		<!-- libraries-->
-		<script type="text/javascript" src="//codeorigin.jquery.com/jquery-1.10.2.min.js"></script>
-		<script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
-		<!-- custom files-->
+<html>  
+    <head>  
+        <meta charset="utf-8">
+        <title>台灣各縣市大學分佈</title>  
+		<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+        <script src="http://d3js.org/topojson.v1.min.js"></script>
+		<script src="index.js"></script>
+        <style type="text/css">
 
-		<script type="text/javascript" src="//d3js.org/topojson.v1.min.js"></script>
-		<script type="text/javascript" src="http://bost.ocks.org/mike/fisheye/fisheye.js?0.0.3"></script>
-		<script type="text/javascript" src="index.js"></script>
-		<style type="text/css">
-			p		{
-				font-family : Microsoft JhengHei;
-				font-size : 30px;
-			}
-			#density	{
-				color : red;
-			}
-			#name	{
-				fon
+			/* Style for Custom Tooltip */
+            div.tooltip {
+                position: absolute;
+                width: 250px;
+                height: auto;
+                padding: 10px;
+                background-color: white;
+                -webkit-border-radius: 10px;
+                -moz-border-radius: 10px;
+                border-radius: 10px;
+                -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+                -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+                box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+                pointer-events: none;
+                font-size: 36px;
+				white-space:pre; 
+				font-family: Microsoft JhengHei;
+            }
+        
+			/* Legend Font Style */
+			body {
+				background: #FFF8D7;
+				
+				/*background-image: url("background.jpg");
+				background-repeat: no-repeat;
+				background-size: cover;*/	
 			}
 		</style>
-		<script>
-			function getCentroid(selection) {
+    </head> 
+    <body>
+        
+        <script type="text/javascript">
+		
+
+            var publicUniversity = {
+				"新北市": 3,
+				"高雄市": 10,
+				"臺中市": 5,
+				"臺北市": 13,
+				"桃園市": 4,
+				"臺南市": 3,
+				"彰化縣": 1,
+				"屏東縣": 2,
+				"雲林縣": 2,
+				"苗栗縣": 1,
+				"新竹縣": 0,
+				"嘉義縣": 1,
+				"南投縣": 1,
+				"宜蘭縣": 1,
+				"新竹市": 5,
+				"基隆市": 1,
+				"花蓮縣": 3,
+				"嘉義市": 1,
+				"臺東縣": 1,
+				"金門縣": 1,
+				"澎湖縣": 1,    
+				"連江縣": 0     
+            };
+			var privateUniversity = {
+				"新北市": 18,
+				"高雄市": 12,
+				"臺中市": 12,
+				"臺北市": 14,
+				"桃園市": 9,
+				"臺南市": 10,
+				"彰化縣": 3,
+				"屏東縣": 2,
+				"雲林縣": 1,
+				"苗栗縣": 2,
+				"新竹縣": 2,
+				"嘉義縣": 3,
+				"南投縣": 2,
+				"宜蘭縣": 2,
+				"新竹市": 5,
+				"基隆市": 2,
+				"花蓮縣": 3,
+				"嘉義市": 1,
+				"臺東縣": 0,
+				"金門縣": 0,
+				"澎湖縣": 0,    
+				"連江縣": 0     
+            };	
+            var width = 1280;
+            var height = 1150;       
+
+            var svg = d3.select("body").append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(0,0)");
+
+            var projection = d3.geo.mercator()
+                .center([122,23.25])
+                .scale(14000)
+                .translate([width, height / 2]);
+
+            var path = d3.geo.path()
+                .projection(projection);
+
+            var div = d3.select("body")
+                .append("div")
+                .attr("class", "tooltip")
+                .style("opacity", 0);
+
+            d3.json("county.json", function (topodata) {
+
+                var features = topojson.feature(topodata, topodata.objects.county).features;
+				
+				var color = d3.scale.linear().domain([0, 27]).range(["#ECF5FF", "#2894FF"]);
+                //var color = d3.scale.linear().domain([0, 19]).range(["#CEFFCE", "#00DB00"]);	
+                
+				for (i = features.length - 1; i >= 0; i--)
+                    features[i].publicUniversity = publicUniversity[features[i].properties.C_Name];
+				
+				for (i = features.length - 1; i >= 0; i--)
+                    features[i].privateUniversity = privateUniversity[features[i].properties.C_Name];
+				
+				
+				
+                svg.selectAll("path")
+                    .data(features)
+                    .enter()
+                    .append("path")
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 2)
+                    .attr("fill", function (d) {
+                        return color(d.publicUniversity + d.privateUniversity);
+                    })
+                    .attr("d", path)
+                    .on("mouseover", function (d) {
+                        d3.select(this)
+                            .attr("fill", "#FF5151");
+							
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", .8);
+						var total = d.publicUniversity + d.privateUniversity;
+                        var center = getCentroid(d3.select(this));
+                        div.text(d.properties.C_Name +  " ( " + total + " 所 )\n公立 : " + d.publicUniversity + "\n私立 : " + d.privateUniversity)
+                            .style("left", center[0] + "px")
+                            .style("top", center[1] + "px");
+
+                    })
+                    .on("mouseout", function (d) {
+                        d3.select(this)
+                            .attr("fill", function (d) {
+                                return color(d.publicUniversity + d.privateUniversity);
+                            })
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", .0);
+                    });
+            });
+
+            function getCentroid(selection) {
                 var element = selection.node(),
-                    bbox = element.getBBox();
-                return [bbox.x + bbox.width / 4, bbox.y + bbox.height / 2];
-			}
-		</script>
-	</head>
-	<body>
-		<svg width="100%" height="600px" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid"></svg>
-		<div >
-			<p id="title"> 台灣大學分布： 
-				<strong id="name"></strong>&nbsp&nbsp
-				<strong id="density"></strong>&nbsp&nbsp所
-			</p>
-		</div>
-	</body>
+                    textBox = element.getBBox();
+                return [textBox.x + textBox.width / 4, textBox.y + textBox.height / 2];
+            }
+
+        </script>
+    </body>    
 </html>
