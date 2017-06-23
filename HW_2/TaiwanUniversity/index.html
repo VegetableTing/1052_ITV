@@ -25,9 +25,7 @@
                 -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
                 box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
                 pointer-events: none;
-                font-size: 36px;
-				white-space:pre; 
-				font-family: Microsoft JhengHei;
+                font-size: 36px;				
             }
         
 			/* Legend Font Style */
@@ -36,15 +34,32 @@
 				
 				/*background-image: url("background.jpg");
 				background-repeat: no-repeat;
-				background-size: cover;*/	
+				background-size: cover;*/
+				font-family: Microsoft JhengHei;				
+				white-space:pre;				
+			}
+			
+			img {
+			    position: absolute;
+				top: 30%;
+				left: 3%;
+				width: 5%;				
+			}
+			
+			strong {
+				position: absolute;
+				top: 3%;
+				left: 3%;
+				font-size: 36px;
 			}
 		</style>
     </head> 
     <body>
-        
+		<strong>台灣各縣市大學分佈</strong>
+		<img src="./color.jpg">
+		
         <script type="text/javascript">
 		
-
             var publicUniversity = {
 				"新北市": 3,
 				"高雄市": 10,
@@ -101,7 +116,7 @@
                 .attr("height", height)
                 .append("g")
                 .attr("transform", "translate(0,0)");
-
+		
             var projection = d3.geo.mercator()
                 .center([122,23.25])
                 .scale(14000)
@@ -114,11 +129,11 @@
                 .append("div")
                 .attr("class", "tooltip")
                 .style("opacity", 0);
-
+				
             d3.json("./county.json", function (topodata) {
                 var features = topojson.feature(topodata, topodata.objects.county).features;
 				
-				var color = d3.scale.linear().domain([0, 27]).range(["#ECF5FF", "#2894FF"]);
+				var color = d3.scale.linear().domain([0, 27]).range(["#ECF5FF", "#0080FF"]);
                 //var color = d3.scale.linear().domain([0, 19]).range(["#CEFFCE", "#00DB00"]);	
                 
 				for (i = features.length - 1; i >= 0; i--)
