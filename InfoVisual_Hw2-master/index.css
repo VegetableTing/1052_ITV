@@ -1,0 +1,22 @@
+path {
+  cursor: pointer;
+}
+
+#info {
+  top: 100px;
+  right: 20px;
+  width: 600px;
+  text-align: center;
+}
+
+#title {
+  font-size: 3em;
+}
+
+#name , #density{
+  font-size: 2em;
+}
+
+#unit {
+  font-size: 32px;
+}
