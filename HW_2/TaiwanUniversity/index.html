@@ -112,7 +112,7 @@
                 .attr("class", "tooltip")
                 .style("opacity", 0);
 
-            d3.json("county.json", function (topodata) {
+            d3.json("./county.json", function (topodata) {
 
                 var features = topojson.feature(topodata, topodata.objects.county).features;
 				
